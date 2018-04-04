@@ -1,0 +1,12 @@
+ABCDF A BD;
+(A)(B);
+(A)(F);
+(A)(D);
+(BD)(A);
+(B)(C);
+(BD)(F);
+x;
+JKL J;
+(J)(K);
+(J)(L);
+x;
