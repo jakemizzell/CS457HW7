@@ -4,7 +4,7 @@
 void getDB(char*,FILE*,int);
 void getKeys(char*,char*,FILE*,int);
 int testForm(char*,char*,char*,FILE*,int);
-int checkKey(char*,int);
+int checkEqual(char*,char*,int,int);
 
 int main(void) {
     int flag = 0;
@@ -32,9 +32,19 @@ int main(void) {
         if(c == ';')
             break;
         form = testForm(db,key,candidate,fp,c);
-        break;
-        printf("%c",c);
+        if(form == 3)
+            printf("3NF\n");
+        else if (form == 2)
+            printf("2NF\n");
+        else
+            printf("1NF\n");
+        flag = 0;
         c = getc(fp);
+        //read up anything until the next DB or EOF
+        while((c < 64 || c > 91) && c != EOF)
+            c = getc(fp);
+        //printf("d%c\n",c);
+        //break;
     }
     //print out the stuff
     fclose(fp);
@@ -43,31 +53,65 @@ int main(void) {
 }
 
 int testForm(char *db, char *key, char *can, FILE *fp, int c) {
-    char *temp[15] = {0};
+    int i;
+    int test1 = 0;
+    int test2 = 0;
+    char temp1[15] = {0};
+    char temp2[15] = {0};
     int form = 3;
-    int flag;
-    //eat up past the first paretheses
-    c = getc(fp);
-    c = getc(fp);
-    c = getc(fp);
-    printf("%c",c);
-    for(int i = 0; key[i] != 0; i++) {
-        if(key[i] == c)
-            flag = 1;
+    while(c != 'x') {
+        //eat up past the first paretheses
+        while (c != '(') {
+            if(c == 'x')
+                return form;
+            c = getc(fp);
+        }
+        c = getc(fp);
+        //add everything to a temp array
+        for (i = 0; c != ')'; i++) {
+            temp1[i] = c;
+            c = getc(fp);
+        }
+        for(i = 0; temp1[i] != 0; i++)
+            printf("%c ",temp1[i]);
+        //test if key is a subset of temp
+        test1 = checkEqual(temp1, key, sizeof(temp1), sizeof(key));
+        printf("Equal1: %d\n", test1);
+        while (c != '(')
+            c = getc(fp);
+        c = getc(fp);
+        //add everything to a temp array
+        for (i = 0; c != ')'; i++) {
+            temp2[i] = c;
+            c = getc(fp);
+        }
+        for(i = 0; temp2[i] != 0; i++)
+            printf("%c ",temp2[i]);
+        //test if key is a subset of temp
+        test2 = checkEqual(temp2, key, sizeof(temp2), sizeof(key));
+        printf("Equal2: %d\n", test2);
+        if (test1 == 0 && test2 == 0)
+            form = 2;
+        printf("Form: %d\n", form);
+        c = getc(fp);
     }
-    //if(flag == 0)
-
-    c =
-
-    //while (c != EOF) {
-        //if (c != '(' || c != ')') {
-
-        //}
-        //c = getc(fp);
-    //}
     return form;
 }
 
+int checkEqual(char *a1,char *a2 , int m, int n) {
+    int i = 0;
+    int j = 0;
+    for (i=0; i<n; i++) {
+        for (j = 0; j<m; j++) {
+            if(a2[i] == a1[j])
+                break;
+        }
+        if (j == m)
+            return 0;
+    }
+    return 1;
+
+}
 void getDB(char *db, FILE *fp, int c) {
     for (int i = 0; c != EOF; i++) {
         if(c == ' ') {
