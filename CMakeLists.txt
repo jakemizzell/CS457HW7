@@ -3,4 +3,4 @@ project(CS457HW7 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(bamaid bamaid.c)
+add_executable(jbmizzell1 jbmizzell1.c)
